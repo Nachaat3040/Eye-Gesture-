@@ -60,4 +60,4 @@ while True:
 # Release resources
 cam.release()
 cv2.destroyAllWindows()
-# Eye-Gesture- © 2023 by Dr. Nachaat Mohamed is licensed under Attribution-NonCommercial 4.0 International 
+Eye-Gesture- © 2023 by Dr. Nachaat Mohamed is licensed under Attribution-NonCommercial 4.0 International 
