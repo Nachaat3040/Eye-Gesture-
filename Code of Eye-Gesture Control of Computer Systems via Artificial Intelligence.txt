@@ -1,0 +1,62 @@
+import cv2
+import mediapipe as mp
+import pyautogui
+import time
+
+# Initialize face mesh model
+face_mesh = mp.solutions.face_mesh.FaceMesh(refine_landmarks=True)
+
+# Capture video from the webcam
+cam = cv2.VideoCapture(0)
+
+# Screen dimensions for mouse control
+screen_w, screen_h = pyautogui.size()
+
+# Main loop
+while True:
+    # Read a frame from the webcam and flip horizontally
+    _, frame = cam.read()
+    frame = cv2.flip(frame, 1)
+
+    # Convert the frame to RGB
+    rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+
+    # Process the frame to get face landmarks
+    output = face_mesh.process(rgb_frame)
+
+    if output.multi_face_landmarks:
+        landmarks = output.multi_face_landmarks[0].landmark
+
+        frame_h, frame_w, _ = frame.shape
+
+        for id, landmark in enumerate(landmarks[474:478]):
+            x = int(landmark.x * frame_w)
+            y = int(landmark.y * frame_h)
+
+            cv2.circle(frame, (x, y), 3, (0, 255, 0))
+
+            if id == 1:
+                screen_x = screen_w / frame_w * x
+                screen_y = screen_h / frame_h * y
+                pyautogui.moveTo(screen_x, screen_y, duration=0.1)
+
+        left = [landmarks[145], landmarks[159]]
+
+        for landmark in left:
+            x = int(landmark.x * frame_w)
+            y = int(landmark.y * frame_h)
+            cv2.circle(frame, (x, y), 3, (0, 255, 255))
+
+        if abs(left[0].y - left[1].y) < 0.004:
+            pyautogui.click()
+            time.sleep(1)
+
+    cv2.imshow('Eye Controlled Mouse', frame)
+
+    # Break the loop if 'q' is pressed
+    if cv2.waitKey(1) & 0xFF == ord('q'):
+        break
+
+# Release resources
+cam.release()
+cv2.destroyAllWindows()
